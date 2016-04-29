@@ -66,6 +66,6 @@ average <- data.tidy %>%
   rename(mean.value = `mean(value)`)
   
 
-##Write the data as csv
+##Write the data as a text file
 write.table(average, file = "./data-cleaning_course-project.txt", 
             row.name = FALSE)
