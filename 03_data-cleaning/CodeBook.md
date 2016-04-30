@@ -21,20 +21,15 @@ http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartpho
 > The steps carried out to transfrom the original data sets and produce the tidy data are:
 
 > 1. Preparatory steps, which include loading the required packages, download the datasets and unzip them into the specified directory, load the data sets into R, and label the columns accordingly
-
 > 2. Merge the training and test data sets into a single data frame
-
 > 3. Extract the measurements on the mean & standard deviation using regular expressions
-
 > 4. Merge the 'activity label' with the data set so that it has descriptive activity names
-
 > 5. Create a second, independent tidy data set with the average of each variable for each activity and each subject
-
 > 6. Export the tidy data set as a text file
 
 ## Output File Description
 > The independent tidy data set contains the following variables:
-- *measurements*, which describes the features selected to be measured
-- *activity.name*, which describes the activity the subject is performing when the measurement was taken
-- *subject*, which identifies the subject by an ID number
-- *mean.value*, which is the calculated average value of each variable for each activity and each subject 
+- _measurements_, which describes the features selected to be measured
+- _activity.name_, which describes the activity the subject is performing when the measurement was taken
+- _subject_, which identifies the subject by an ID number
+- _mean.value_, which is the calculated average value of each variable for each activity and each subject 
