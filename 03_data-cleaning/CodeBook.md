@@ -29,7 +29,7 @@ http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartpho
 
 ## Output File Description
 > The independent tidy data set contains the following variables:
-- _measurements_, which describes the features selected to be measured
-- _activity.name_, which describes the activity the subject is performing when the measurement was taken
-- _subject_, which identifies the subject by an ID number
-- _mean.value_, which is the calculated average value of each variable for each activity and each subject 
+- **measurements**, which describes the features selected to be measured
+- **activity.name**, which describes the activity the subject is performing when the measurement was taken
+- **subject**, which identifies the subject by an ID number
+- **mean.value**, which is the calculated average value of each variable for each activity and each subject 
