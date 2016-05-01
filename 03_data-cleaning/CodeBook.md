@@ -19,7 +19,97 @@ http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartpho
 
 ## Output File Description
 > The independent tidy data set produced by the R script contains the following variables:
-- **measurements**, which describes the features selected to be measured
-- **activity.name**, which describes the activity the subject is performing when the measurement was taken
+- **measurements**, which describes the features selected to be measured. They are:
+  - angle.tBodyAccJerkMean..gravityMean.
+  - angle.tBodyAccMean.gravity.
+  - angle.tBodyGyroJerkMean.gravityMean.
+  - angle.tBodyGyroMean.gravityMean.
+  - angle.X.gravityMean.
+  - fBodyAcc.bandsEnergy...1.24.2
+  - fBodyAcc.bandsEnergy...25.48.2
+  - fBodyAcc.maxInds.Y
+  - fBodyAcc.maxInds.Z
+  - fBodyAcc.mean...X
+  - fBodyAcc.mean...Y
+  - fBodyAcc.mean...Z
+  - fBodyAcc.meanFreq...X
+  - fBodyAcc.std...X
+  - fBodyAccJerk.bandsEnergy...1.24.2
+  - fBodyAccJerk.bandsEnergy...25.48.2
+  - fBodyAccJerk.maxInds.Y
+  - fBodyAccJerk.maxInds.Z
+  - fBodyAccJerk.mean...X
+  - fBodyAccJerk.mean...Y
+  - fBodyAccJerk.mean...Z
+  - fBodyAccJerk.meanFreq...X
+  - fBodyAccJerk.std...X
+  - fBodyAccMag.entropy..
+  - fBodyAccMag.kurtosis..
+  - fBodyAccMag.skewness..
+  - fBodyBodyAccJerkMag.entropy..
+  - fBodyBodyAccJerkMag.kurtosis..
+  - fBodyBodyAccJerkMag.skewness..
+  - fBodyBodyGyroJerkMag.entropy..
+  - fBodyBodyGyroJerkMag.kurtosis..
+  - fBodyBodyGyroJerkMag.skewness..
+  - fBodyBodyGyroMag.entropy..
+  - fBodyBodyGyroMag.kurtosis..
+  - fBodyBodyGyroMag.skewness..
+  - fBodyGyro.bandsEnergy...1.24.2
+  - fBodyGyro.bandsEnergy...25.48.2
+  - fBodyGyro.maxInds.Y
+  - fBodyGyro.maxInds.Z
+  - fBodyGyro.mean...X
+  - fBodyGyro.mean...Y
+  - fBodyGyro.mean...Z
+  - fBodyGyro.meanFreq...X
+  - fBodyGyro.std...X
+  - tBodyAcc.correlation...X.Z
+  - tBodyAcc.correlation...Y.Z
+  - tBodyAcc.mean...X
+  - tBodyAcc.mean...Y
+  - tBodyAcc.mean...Z
+  - tBodyAcc.std...X
+  - tBodyAccJerk.correlation...X.Z
+  - tBodyAccJerk.correlation...Y.Z
+  - tBodyAccJerk.mean...X
+  - tBodyAccJerk.mean...Y
+  - tBodyAccJerk.mean...Z
+  - tBodyAccJerk.std...X
+  - tBodyAccJerkMag.arCoeff..3
+  - tBodyAccJerkMag.arCoeff..4
+  - tBodyAccMag.arCoeff..3
+  - tBodyAccMag.arCoeff..4
+  - tBodyGyro.correlation...X.Z
+  - tBodyGyro.correlation...Y.Z
+  - tBodyGyro.mean...X
+  - tBodyGyro.mean...Y
+  - tBodyGyro.mean...Z
+  - tBodyGyro.std...X
+  - tBodyGyroJerk.correlation...X.Z
+  - tBodyGyroJerk.correlation...Y.Z
+  - tBodyGyroJerk.mean...X
+  - tBodyGyroJerk.mean...Y
+  - tBodyGyroJerk.mean...Z
+  - tBodyGyroJerk.std...X
+  - tBodyGyroJerkMag.arCoeff..3
+  - tBodyGyroJerkMag.arCoeff..4
+  - tBodyGyroMag.arCoeff..3
+  - tBodyGyroMag.arCoeff..4
+  - tGravityAcc.correlation...X.Z
+  - tGravityAcc.correlation...Y.Z
+  - tGravityAcc.mean...X
+  - tGravityAcc.mean...Y
+  - tGravityAcc.mean...Z
+  - tGravityAcc.std...X
+  - tGravityAccMag.arCoeff..3
+  - tGravityAccMag.arCoeff..4
+- **activity.name**, which describes the activity the subject is performing when the measurement was taken. The available labels are:
+  - WALKING
+  - WALKING_UPSTAIRS
+  - WALKING_DOWNSTAIRS
+  - SITTING
+  - STANDING
+  - LAYING
 - **subject**, which identifies the subject by an ID number
 - **mean.value**, which is the calculated average value of each variable for each activity and each subject 
