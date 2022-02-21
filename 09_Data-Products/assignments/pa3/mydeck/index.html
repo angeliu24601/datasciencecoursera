@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reproducible Pitch</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Reproducible Pitch">
+  <meta name="author" content="A. Liu">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Reproducible Pitch</h1>
+    <h2>Baby Names Popularity Trend</h2>
+    <p>A. Liu<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <article data-timings="">
+    <style>
+.title-slide {
+  background-color: #FFFFFF; /* #EDE0CF; ; #CA9F9D*/
+}
+</style>
+
+<h2>The perfect name</h2>
+
+<ul>
+<li><p>Trying to pick the perfect baby name? Have a name in mind but want to find more about its popularity?</p></li>
+<li><p>The Shiny app uses the Social Security Administration (SSA)&#39;s baby name data, based on Social Security card applications for births occured in the United States after 1897.</p></li>
+<li><p>More information regarding the data set can be found at the SSA&#39;s website:
+<a href="https://www.ssa.gov/oact/babynames/limits.html">https://www.ssa.gov/oact/babynames/limits.html</a>. This includes all names with at least 5 uses.</p></li>
+<li><p>Two data sets are provided (&quot;National data&quot; and &quot;State-specific data&quot;). Since this app does not involve geographic visualizations, only the &quot;National data&quot; is used.</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="smallcode" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Getting and loading the data</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">if (file.exists(&quot;./data_inputs/names.zip&quot;) == FALSE) {
+        url1 &lt;- &quot;https://www.ssa.gov/oact/babynames/names.zip&quot;
+        download.file(url1, &quot;./data_inputs/names.zip&quot;)
+        unzip(&quot;./data_inputs/names.zip&quot;, exdir = &quot;./data_inputs/names&quot;)
+}
+
+## load required packages
+suppressMessages(library(dplyr));library(slidify);library(ggplot2)
+
+## create a list of the files and the corresponding year the file represent
+list_names &lt;- list.files(&quot;./data_inputs/names&quot;,
+                         pattern = &quot;txt&quot;, full.names = TRUE) %&gt;% 
+        data.frame(FILE_PATH = ., stringsAsFactors = FALSE) %&gt;%
+        mutate(YEAR = as.numeric(gsub(&quot;[^0-9]&quot;, &quot;&quot;, .$FILE_PATH)))
+
+## import the data and add the &#39;year&#39; as an additional variable so that the
+## consolidated data frame is ready for analysis
+names &lt;-data.frame()
+for (i in seq_along(list_names$FILE_PATH)) {
+        names0 &lt;- read.table(list_names$FILE_PATH[i], sep = &quot;,&quot;,
+                             col.names = c(&quot;NAME&quot;, &quot;GENDER&quot;, &quot;COUNT&quot;))
+        names0$YEAR &lt;- list_names$YEAR[i]
+        names &lt;- rbind(names, names0)
+}
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="smallcode" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Data Analysis Question</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>For this Shiny app, we will focus on: <strong>How has the popularity of a baby name changed over time?</strong></p>
+
+<ul>
+<li>For example, we can take a look at how the popularity of the name &quot;Eva&quot; has changed over the years</li>
+<li>The code below plots the count of the baby named &quot;Eva&quot; over the whole period where data is available (see the next slide for the plot)</li>
+<li>For the shiny app, we will build something reactive so that each user can explore the topic without having to code</li>
+</ul>
+
+<pre><code class="r">## select name and years to view the trend
+enter_name &lt;- &quot;Eva&quot;; year_range &lt;- c(1880, 2015)
+filtered_data &lt;- filter(names, NAME == enter_name, YEAR &gt;= year_range[1], 
+                        YEAR &lt;= year_range[2]) %&gt;%
+        group_by(NAME, YEAR) %&gt;% summarise(COUNT = sum(COUNT))
+
+## visualize the trend
+ggplot(filtered_data, aes(x = YEAR, y = COUNT)) + geom_line() +
+        scale_x_continuous(minor_breaks = seq(year_range[1],year_range[2], by = 1)) +
+        labs(title = paste0(&quot;Poplularity of the name \&#39;&quot;, enter_name,&quot;&#39; between &quot;, year_range[1], 
+                            &quot; and &quot;, year_range[2]),
+             y = paste0(&quot;Number of babies named &quot;, enter_name))
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class.id" id="slide-4" style="background:;">
+  <article data-timings="">
+    <p><img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='NA'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Getting and loading the data'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Data Analysis Question'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='NA'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>

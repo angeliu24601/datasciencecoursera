@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Baby Names Popularity Trend\"\nauthor: \"Ange Liu\"\ndate: \"12/18/2016\"\noutput: ioslides_presentation\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = FALSE)\n```\n\n## R Markdown\n\n",
+    "created" : 1482082157645.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3700155716",
+    "id" : "A317F155",
+    "lastKnownWriteTime" : 1482082268,
+    "last_content_update" : 1482082268602,
+    "path" : "~/Downloads/OneDrive - Inter-American Development Bank Group/ForMe/Coursera_DataScience/08_Data-Products/assignments/pa3/R/presentation.Rmd",
+    "project_path" : "R/presentation.Rmd",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

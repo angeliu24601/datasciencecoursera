@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "setwd(\"./hw\")\n#1. Take a look at the 'iris' dataset that comes with R. The data can be loaded with the code:\nlibrary(datasets)\ndata(iris)\n# A description of the dataset can be found by running\n?iris\n# There will be an object called 'iris' in your workspace. In this dataset, what is the mean of\n# 'Sepal.Length' for the species virginica? Please round your answer to the nearest whole number.\nspecies.mean <- tapply(iris$Sepal.Length, iris$Species, mean)\nans1 <- round(species.mean[[3]])\n\n#2. Continuing with the 'iris' dataset from the previous Question, what R code returns a \n# vector of the means of the variables 'Sepal.Length', 'Sepal.Width', 'Petal.Length', \n# and 'Petal.Width'?\napply(iris[, 1:4], 2, mean)\n\n#3. Load the 'mtcars' dataset in R with the following code\nlibrary(datasets)\ndata(mtcars)\n# There will be an object names 'mtcars' in your workspace. You can find some \n# information about the dataset by running\n?mtcars\n# How can one calculate the average miles per gallon (mpg) by number of cylinders in the \n# car (cyl)? Select all that apply.\nsapply(mtcars, cyl, mean) #no\ntapply(mtcars$cyl, mtcars$mpg, mean) #no\nwith(mtcars, tapply(mpg, cyl, mean)) #yes\nmean(mtcars$mpg, mtcars$cyl) #no\nsapply(split(mtcars$mpg, mtcars$cyl), mean) #yes\napply(mtcars, 2, mean) #no\nlapply(mtcars, mean) #no\ntapply(mtcars$mpg, mtcars$cyl, mean) #yes\nsplit(mtcars, mtcars$cyl) #no\n\n#4. Continuing with the 'mtcars' dataset from the previous Question, what is the absolute\n# difference between the average horsepower of 4-cylinder cars and the average \n# horsepower of 8-cylinder cars?\navg <- with(mtcars, tapply(hp, cyl, mean))\nans4 <- round(avg[[3]] - avg[[1]])\n\n#5. If you run debug(ls), what happens when you next call the 'ls' function?\ndebug(ls)\nls()\nundebug(ls)\n",
+    "created" : 1460493814801.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4212812802",
+    "id" : "8E017346",
+    "lastKnownWriteTime" : 1460497992,
+    "last_content_update" : 1460497992883,
+    "path" : "D:/DATA.IDB/Documents/OneDrive - Inter-American Development Bank Group/Coursera_DataScience/02_R-Programming/assingments/hw/02_r-programming_hw3_script.R",
+    "project_path" : "hw/02_r-programming_hw3_script.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,4 @@
+"0","boxplot_am <- mtcars %>% ggplot(aes(x = factor(am), y = mpg)) + geom_boxplot() + "
+"0","        scale_x_discrete(labels = c(""Automatic"", ""Manual"")) +"
+"0","        labs(x = ""Transmission Type"", y = ""Miles per Gallon (MPG)"")"
+"0","boxplot_am"

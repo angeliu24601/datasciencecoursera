@@ -1,0 +1,176 @@
+---
+title: "Course Project - Practical Machine Learning"
+author: "Ange Liu"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: true 
+      smooth_scroll: true
+    theme: "lumen"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse);library(caret)
+library(knitr);library(DT);library(randomForest)
+```
+
+## Background and Objective
+
+6 participants were asked to perform barbell lifts in 6 (1 correct and 5 incorrect) different ways. Using the data from accelerometers on the belt, forearm, arm, and dumbell of the 6 participants during the exercise, we will try to predict the manner of the excercise performed.
+
+## Getting and exploring the data
+
+First, we download the data from the following links and save them:
+
+```{r message=FALSE, cache=TRUE}
+download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv",
+              "./data/pml-training.csv")
+download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv",
+              "./data/pml-testing.csv")
+```
+
+We will load only the **training** data for now, leaving the **test** data aside.  
+
+```{r}
+training <- read.csv("./data/pml-training.csv", stringsAsFactors = FALSE,
+                     ## attn: several different NA strings
+                     na.strings = c("", "#DIV/0!", NA_character_))
+```
+
+Since there are a lot of variables in the data set (`r ncol(training)`), let's first explore them before fitting the models.
+
+```{r}
+## create a dataframe and store the characteristics of the variables
+ref.columns <- tibble(
+      ## column names
+      COLNAME = colnames(training),
+      ## column class
+      CLASS = map_chr(training, class) %>% unname(),
+      ## how many NAs in each column
+      N_NA = map_int(training, ~ is.na(.x) %>% sum())) %>% 
+  ## what is the percentage of NAs for each column
+  mutate(PERCENT_NA = round(N_NA / nrow(training), 3))
+
+## print the table nicely
+datatable(ref.columns, filter = "top")
+```
+
+## Data Preprocessing
+
+### Data Cleaning
+
+Looking at the table, we can see many of the variables have a significant percentage of missing values. We will clean up the data by setting a threshold (e.g. 90%) and exclude those with higher percentage of missing values from the model fitting. In addition, we will also exclude those variables that are not the measurements from the accelerometers.
+
+The variables that we will end up keeping are:
+```{r}
+InCols <- ref.columns %>% 
+  filter(PERCENT_NA < 0.9, 
+         !str_detect(COLNAME, "X|user_name|timestamp|window")) %>% 
+  pull(COLNAME) %>% 
+  print()
+```
+
+### Data Partitioning
+
+Since the **test** data from the source will be used for the *Prediction Quiz*, we will have to withhold part of the **training** data from the model and use them as **testing** data to evaluate the models.
+
+```{r}
+set.seed(202)
+InTrain <- createDataPartition(y = training$classe, p = 0.75, list = FALSE)
+part_train <- training[InTrain, InCols]
+part_test <- training[-InTrain,] %>% mutate(classe = factor(classe))
+```
+
+## Model Building
+
+For this project, we will try the following methods using the partitioned training data and compare the accuracy of the models using the partitioned test data.
+
+* Classification and Regressio Trees (CART)
+* Gradient Boosting Model (GBM)
+* Random Forest (RF)
+
+### Fit and save the models
+
+*CART Model*
+```{r, cache = TRUE}
+## fit the CART model
+model_rpart <- train(classe ~ ., data = part_train, method = "rpart")
+
+## cache the fitted model
+saveRDS(model_rpart, "./model/model_rpart.rds")
+```
+
+*GMB*
+```{r, cache = TRUE, results = "hide"}
+## fit the GBM
+model_gbm <- train(classe ~ ., data = part_train, method = "gbm")
+
+## cache the fitted model
+saveRDS(model_gbm, "./model/model_gbm.rds")
+```
+
+*RF*
+```{r, cache = TRUE, eval=FALSE}
+## fit the rf model
+model_rf <- train(classe ~ ., data = part_train, method = "rf")
+
+## cache the fitted model
+saveRDS(model_rf, "./model/model_rf.rds")
+```
+
+### Model selection
+
+Using the withheld partition, we will predict the manner of excercise using each model and compare the predicted values with the true ones.
+
+```{r}
+## load the saved model
+model_rpart <- readRDS("./model/model_rpart.rds")
+model_gbm <- readRDS("./model/model_gbm.rds")
+model_rf <- readRDS("./model/model_rf.rds")
+
+## predict the class
+predict_rpart <- predict(model_rpart, newdata = part_test)
+predict_gbm <- predict(model_gbm, newdata = part_test)
+predict_rf <- predict(model_rf, newdata = part_test)
+
+## get the confusion matrix for the models
+cfm_rpart <- confusionMatrix(predict_rpart, part_test$classe)
+cfm_gbm <- confusionMatrix(predict_gbm, part_test$classe)
+cfm_rf <- confusionMatrix(predict_rf, part_test$classe)
+```
+
+The model accuracies are the following. The RF model is the one with the highest accuracy.
+
+```{r}
+tibble(MODEL = c("CART", "GBM", "RF"),
+       ACCURACY = c(cfm_rpart$overall["Accuracy"],
+                        cfm_gbm$overall["Accuracy"],
+                        cfm_rf$overall["Accuracy"]))
+```
+
+We can take a look at the variable importance of the wining RF model:
+
+```{r, message = FALSE}
+varImp(model_rf)
+```
+
+## Prediction Quiz
+
+Now that we have settled on a model, we can proceed to predict the manner of excercise in the **test** data from the source.
+
+```{r}
+## load the downloaded data
+test <- read.csv("./data/pml-testing.csv", stringsAsFactors = FALSE,
+                    ## attn: several different NA strings
+                    na.strings = c("", "#DIV/0!", NA_character_))
+
+## make the prediction
+predict_quiz <- predict(model_rf, newdata = test)
+
+## the prediction results are the following
+tibble(PROBLEM_ID = test$problem_id, PREDICTED_VALUE = predict_quiz)
+```
+

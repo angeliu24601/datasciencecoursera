@@ -1,0 +1,11 @@
+name: shiny
+title: shiny
+account: aliu
+server: shinyapps.io
+appId: 147899
+bundleId: 662840
+url: https://aliu.shinyapps.io/shiny/
+when: 1482946685.63574
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "## Load required packages\nsuppressMessages(library(dplyr))\n\n## import data of baby names\n### list files with the names by State\nfilesbystate <- list.files(\"./assignments/pa3/data_inputs/namesbystate\",\n                           pattern = \".TXT\",\n                           recursive = TRUE,\n                           full.names = TRUE)\n### 'for' loop to read in all the files and combine them together\nnamesbystate <- data_frame()\n\nfor (i in seq_along(filesbystate)) {\n        namesbystate0 <- read.table(filesbystate[[i]], sep = \",\")\n        namesbystate <- rbind(namesbystate, namesbystate0)\n}\n\ncolnames(namesbystate) <- c(\"STATE\",\"GENDER\", \"YEAR\", \"NAME\", \"COUNT\")\n\nrm(i, namesbystate0)\n\n## create data set without States\nnames <- namesbystate %>% group_by(YEAR, GENDER, NAME) %>%\n        summarise(COUNT = sum(COUNT))\n\n## save data sets\nsaveRDS(names, \"./assignments/pa2/data_outputs/ssnames.Rds\")\nsaveRDS(namesbystate,\"./assignments/pa2/data_outputs/ssnames_by_state.Rds\")\nrm(filesbystate)\n",
+    "created" : 1480220729336.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3858983378",
+    "id" : "6ADB942A",
+    "lastKnownWriteTime" : 1480044716,
+    "last_content_update" : 1480044716,
+    "path" : "~/Downloads/OneDrive - Inter-American Development Bank Group/ForMe/Coursera_DataScience/08_Data-Products/assignments/pa3/R/load.R",
+    "project_path" : "assignments/pa3/R/load.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

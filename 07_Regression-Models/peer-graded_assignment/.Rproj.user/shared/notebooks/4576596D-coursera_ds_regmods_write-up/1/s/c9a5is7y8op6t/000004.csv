@@ -1,0 +1,4 @@
+"0","corr_plot <- mtcars %>% "
+"0","        ggpairs(upper = list(continuous = wrap(""cor"", size = 4)),"
+"0","                lower = list(continuous = wrap(""smooth"", method = ""lm""))"
+"0","                ) %>% print(progress = FALSE)"

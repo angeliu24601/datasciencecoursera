@@ -1,0 +1,160 @@
+---
+title: NOAA Storm Data Analysis on population health and economic consequences
+output:
+  html_document:
+    theme: readable
+---
+
+##Synopsis
+This report explores and analyzes the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database, which tracks characteristics of major storms and weather events in the United States, including:
+- when and where they occur
+- estimates of any fatalities, injuries, and property damage
+
+The analysis reveals that:
+
+- Tornado is by far the most harmful type of events to population health, with 96,979 total fatalities or injuries
+- Flood is the most damaging type of events in terms of economic consequences, with around 150 billion dollars of losses
+
+##Data Processing
+
+###1. Download the source file from the internet and read it into R
+```{r cache=TRUE}
+if (!file.exists("./StormData.csv.bz2")) {
+URL <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
+download.file(URL,"./StormData.csv.bz2")}
+StormData <- read.csv(bzfile("./StormData.csv.bz2"))
+```
+
+###2. Data cleaning
+####2.1 Data cleaning on the types of events (as indicated in the EVTYPE variable)
+To list all the unique events from the Storm Data and perform a visual inspection:
+```{r results="hide", cache=TRUE}
+EVENTS <- sort(unique(StormData$EVTYPE))
+UniqueEvents <- nlevels(EVENTS)
+```
+The result is omitted since the list is very long (`r UniqueEvents` unique values)
+
+Based on the inspection, it is necessary to perform a data cleaning for the types of events recorded in the EVTYPE variable since it contains several issues that cause the same types of events to be recorded as different ones. For example:
+
+- Upper and lower cases for the same events, such as "Black Ice" vs. "BLACK ICE"
+- Typos, such as "HEAVY PRECIP**I**TATION" vs. "HEAVY PRECIP**A**TATION"
+- Different wording for the same events, such as "Flash Flood" vs. "Flash Flooding"
+- Abbreviations in some cases but not in others, such as "THUNDERSTORM" vs. "TSTM"
+
+#####A Proper way of cleaning up the data
+The list of examples above is by no means exhaustive, and even from this short list it seems that the types of errors are introduced by human factors and most of them do not share the same pattern at all. Therefore, it is extremely difficult to clean up the data through a few systematic transformations of the values in EVTYPE. One of the proper methods to unify these distinct values that represent the same types of events could be:
+
+- To perform a one-off review of the 985 unique values and devise a lookup table, which contains in the first column, the original codes for the types of events, and on the second column, the cleaned-up version of the codes.
+- This conversion table can then be used to convert the codes in the StormData for EVTYPE and thus eliminate, or at least minimize, the issue described before.
+
+#####Data cleaning performed in this analysis:
+However, the type of data cleaning described above requires a fairly significant amount of manual revision. Since the purpose of this analysis is to report on the **TOP 1** event in terms of damages to population health / economic consequences, the only data cleaning done at the moment is to convert all values to capitalized letters.
+```{r cache=TRUE}
+StormData2 <- StormData
+StormData2$EVTYPE <- factor(toupper(StormData2$EVTYPE))
+rm(StormData)
+EVENTS_clean <- sort(unique(StormData2$EVTYPE))
+UniqueEvents_clean <- nlevels(EVENTS_clean)
+```
+After the transformation, we can see that the unique types of events are reduced to `r UniqueEvents_clean`
+
+####2.2 Data cleaning on the magnitude of damages (as indicated in the PROPDMGEXP and CROPDMGEXP variables)
+The magnitude of the damages (either to property or to crop) is expressed by the PROPDMGEXP and CROPDMGEXP variables. Thus, to make sure the calculation on damages is accurate, it is important to make sure the same magnitudes are recorded in the same way. To view all the unique values recorded in these two variables:
+```{r cache=TRUE}
+DMGEXP <- as.data.frame(unique(c(as.vector(unique(StormData2$PROPDMGEXP)),
+                                 as.vector(unique(StormData2$CROPDMGEXP)))))
+colnames(DMGEXP) <- "DMGEXP_ORG"
+print(as.list(DMGEXP))
+```
+It is obvious that for the same magnitudes, different notations are used (e.g. M or m vs. 6). To unify the values in PROPDMGEXP and CROPDMGEXP, we can create a conversion table with the original and new values to anotate the exponentials. The new values are all numeric ones. The conversion is done based on the following criteria:
+
+- B or b = 9
+- M or m = 6
+- K or k = 3
+- H or h = 2
+- original numeric values are mantained as is
+- all the other values (BLANK, +, -) are assumed to be 1
+
+```{r results='hide', cache=TRUE}
+library(dplyr)
+DMGEXP <- mutate (DMGEXP, DMGEXP_NEW = 
+                    ifelse(DMGEXP_ORG %in% c(0:9),
+                           as.numeric(DMGEXP$DMGEXP_ORG)-5,
+                           ifelse(DMGEXP_ORG %in% c("H","h"),2,
+                                  ifelse(DMGEXP_ORG %in% c("K","k"),3,
+                                         ifelse(DMGEXP_ORG %in% c("M","m"),6,
+                                                ifelse (DMGEXP_ORG %in% 
+                                                          c("B","b"),9,1))))))
+```
+
+Using sqldf package, convert the values of damages in original data set and subset the variables needed for later analysis on economic consequences
+```{r results='hide', cache=TRUE}
+library(sqldf)
+Dmgs <- sqldf("select EVTYPE, PROPDMG, PROP.DMGEXP_NEW as PROPDMGEXP, CROPDMG, CROP.DMGEXP_NEW as CROPDMGEXP from StormData2 left join DMGEXP as PROP on PROPDMGEXP = PROP.DMGEXP_ORG left join DMGEXP as CROP on CROPDMGEXP = CROP.DMGEXP_ORG")
+rm(DMGEXP)
+```
+The package sqldf is used simplily due to my personal familiarity with SQL commands. Other commands in other R packages can easily perform the same task.
+
+###3. Data set for analyzing the impact on economic consequences
+
+Using the clean data set "Dmgs", we can calculate the damages for properties and crops in terms of absolute amounts (as PROPDMGAMNT and CROPDMGAMNT) and calculate the total damaged amounts as DMGAMNT
+```{r cache=TRUE, results='hide'}
+library(dplyr)
+Dmgs <- mutate(Dmgs,PROPDMGAMNT = PROPDMG*10^PROPDMGEXP, 
+               CROPDMGAMNT = CROPDMG*10^CROPDMGEXP, 
+               DMGAMNT = PROPDMGAMNT + CROPDMGAMNT)
+```
+Aggregate the damaged amount according to EVTYPE and we have the data set that will be used for analysis regarding the economic consequences "Dmgs_evtype"
+```{r cache=TRUE, results='hide'}
+library(dplyr)
+Dmgs_evtype <- aggregate(.~EVTYPE, data=subset(Dmgs,select=c(EVTYPE,PROPDMGAMNT,CROPDMGAMNT,DMGAMNT)),FUN=sum)
+```
+
+###4. Data set for analyzing the impact on population health
+First, subset the fatalities and injuries (as indicated by the FATALITIES and INJURIES variables), and aggregate the numbers by types of events. THen, calculate the total of fatalities and injuries and create the variable FATALITIES&INJURIES to store the total. "PopHealth" will be the data set will be used for analysis regarding the impact on population health
+```{r cache=TRUE, results='hide'}
+library(dplyr)
+PopHealth <- aggregate(.~EVTYPE, 
+                       data=subset(StormData2,
+                                   select=c(EVTYPE,FATALITIES, INJURIES)), 
+                       FUN=sum)
+PopHealth <- mutate(PopHealth, TOTAL = FATALITIES + INJURIES)
+```
+
+##Results
+###1. Across the United States, which types of events are most harmful with respect to population health?
+- Based on the processed data set (PopHealth), calculate the type of event with the most fatalities or injuries
+```{r}
+most_harmful <- PopHealth[which.max(PopHealth$TOTAL),]
+print(most_harmful)
+```
+- The most harmful event in terms of fatalities is `r most_harmful$EVTYPE`
+- The following plot provides more details in term of the 5 types of events most harmful to population health
+```{r cache=TRUE, results='hide'}
+library(ggplot2)
+PopHealth_plot <- arrange(PopHealth,desc(TOTAL))
+q1 <- qplot(EVTYPE, TOTAL ,data= PopHealth_plot[c(1:5),], 
+            xlab = "Types of Events", 
+            ylab = "Total number of Fatalities & Injuries") + 
+  geom_bar(stat = "identity")
+print(q1)
+```
+
+###2. Across the United States, which types of events have the greatest economic consequences?
+- Based on the processed data set (Dmgs_evtype), calculate the type of event with the most amount of damages
+```{r}
+most_damages <- Dmgs_evtype[which.max(Dmgs_evtype$DMGAMNT),]
+print(most_damages)
+```
+- The most harmful event in terms of total damages is `r most_damages$EVTYPE`
+- The following plot provides more details in term of the 5 types of events that caused the most damages
+```{r cache=TRUE, results='hide'}
+library(ggplot2)
+Dmgs_evtype_plot <- arrange(Dmgs_evtype,desc(DMGAMNT))
+q2 <- qplot(EVTYPE, DMGAMNT ,
+            data= Dmgs_evtype_plot[c(1:5),], 
+            xlab = "Types of Events", 
+            ylab = "Total Amount of Damages in USD") + 
+  geom_bar(stat = "identity")
+print(q2)
+```

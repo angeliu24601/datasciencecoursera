@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "# load required packages\nlibrary(shiny)\n\n# load 'baby names' data set\nnames <- readRDS(\"../data_outputs/ssnames.Rds\")\nnamesbystate <- readRDS(\"../data_outputs/ssnames_by_state.Rds\")\n\n# Define UI for application that draws a line\nui <- fluidPage(\n        # Application title\n        titlePanel(\"Baby Name Trend\"),\n\n)\n\n# Define server logic required to draw a histogram\nserver <- function(input, output) {\n\n}\n\n# Run the application\nshinyApp(ui = ui, server = server)\n\n",
+    "created" : 1480220737656.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1760267570",
+    "id" : "44F4FF3D",
+    "lastKnownWriteTime" : 1480220898,
+    "last_content_update" : 1480220898345,
+    "path" : "~/Downloads/OneDrive - Inter-American Development Bank Group/ForMe/Coursera_DataScience/08_Data-Products/assignments/pa3/R/app.R",
+    "project_path" : "assignments/pa3/R/app.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

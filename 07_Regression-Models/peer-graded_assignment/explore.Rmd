@@ -1,0 +1,86 @@
+---
+title: "Motor Trend - Exploratory Analysis"
+output: html_notebook
+---
+
+
+```{r setup, message=FALSE}
+## load data set and required packages
+data(mtcars); library(tidyverse); library(ggplot2);library(GGally)
+```
+
+## Executive Summary
+xxxxxxxxxx
+
+
+## Data Pre-processing
+
+
+
+```{r}
+head(mtcars)
+```
+
+Notice that the car makes are row names instead of column and all variables appear as numeric variable while some are actually factors
+```{r}
+mtcars_tidy <- mtcars %>% 
+        ## incorporate "row name" as an column
+        rownames_to_column(var = "make") %>%
+        ## convert categorical variables from numeric to factor
+        map_at(.at = c("make","cyl", "vs", "am", "gear", "carb"), 
+               .f = factor) %>%
+        as_tibble() %>%
+        ## recode binary variables based on their meaning:
+        ## - for "am": 0 = automatic, 1 = manual
+        ## - for "vs": 0 = v-engine, 1 = straight engine
+        mutate(am = recode(am, `0` = "automatic", `1` = "manual"),
+               vs = recode(vs, `0` = "v", `1` = "s"))
+```
+
+## Exploratory Analysis
+
+Plot the relations between MPG and Type of Transimission
+```{r}
+ggplot(data = mtcars) + geom_boxplot(aes(x = factor(am), y = mpg))
+```
+
+Check the correlation between mpg and other variables
+```{r}
+corr <- cor(mtcars) %>% as.data.frame() %>%
+        rownames_to_column(var = "var") %>%
+        select(var, mpg, am) %>% print
+
+vars <- corr %>% filter(abs(mpg) >= corr[which(corr$var=="mpg"), "am"]) %>% .$var
+```
+
+Visualize those variables with a stronger correlation with `mpg` than `am`
+
+```{r fig.height=8, fig.width=8}
+corr_plot <- mtcars %>% 
+        ggpairs(upper = list(continuous = wrap("cor", size = 4)),
+                lower = list(continuous = wrap("smooth", method = "lm"))
+                )
+print(corr_plot, progress = FALSE)
+```
+
+
+## Model fitting
+```{r}
+t.test(mpg ~ am, data = mtcars)
+```
+
+### Simple Linear Regression
+```{r}
+fit1 <- lm(mpg ~ am, mtcars)
+summary(fit1)
+```
+
+### Multiple Linear Regression
+
+```{r}
+fit2 <- lm(mpg ~ am + wt + cyl + disp, data = mtcars)
+summary(fit2)
+```
+
+
+## Residual Plot & Diagnostics

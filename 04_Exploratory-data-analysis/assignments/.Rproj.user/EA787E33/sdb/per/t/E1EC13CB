@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "## 1. Under the lattice graphics system, what do the primary plotting functions like \n## xyplot() and bwplot() return?\n## ans: an object of class \"trellis\"\n\n## 2. What is produced by the following code?\nlibrary(nlme)\nlibrary(lattice)\nxyplot(weight ~ Time | Diet, BodyWeight)\n## ans: A set of 3 panels showing the relationship between weight and time for each diet.\n\n## 3. Annotation of plots in any plotting system involves adding points, lines, \n## or text to the plot, in addition to customizing axis labels or adding titles. \n## Different plotting systems have different sets of functions for annotating \n## plots in this way.\n## Which of the following functions can be used to annotate the panels\n## in a multi-panel lattice plot?\n## ans: panel.lmline(); panel.abline()\n\n## 4. The following code does NOT result in a plot appearing on the screen device.\nlibrary(lattice)\nlibrary(datasets)\ndata(airquality)\np <- xyplot(Ozone ~ Wind | factor(Month), data = airquality)\n## Which of the following is an explanation for why no plot appears?\n## ans: The object 'p' has not yet been printed with the appropriate print method.\n\n## 5. In the lattice system, which of the following functions can be used to \n## finely control the appearance of all lattice plots?\n## ans: trellis.par.set\n\n## 6. What is ggplot2 an implementation of?\n## ans: the Grammar of Graphics developed by Leland Wilkinson\n\n## 7. Load the `airquality' dataset form the datasets package in R\n## I am interested in examining how the relationship between ozone \n## and wind speed varies across each month. What would be the appropriate code \n## to visualize that using ggplot2?\nlibrary(datasets)\nlibrary(ggplot2)\ndata(airquality)\nairquality = transform(airquality, Month = factor(Month))\nqplot(Wind, Ozone, data = airquality, facets = . ~ Month)\n\n## 8. What is a geom in the ggplot2 system?\n## ans: a plotting object like point, line, or other shape\n\n## 9. When I run the following code I get an error:\nlibrary(ggplot2)\nlibrary(ggplot2movies)\ng <- ggplot(movies, aes(votes, rating))\nprint(g)\n## I was expecting a scatterplot of 'votes' and 'rating' to appear. What's the problem?\n## ggplot does not yet know what type of layer to add to the plot.\n \n## The following code creates a scatterplot of 'votes' and 'rating' from the movies \n## dataset in the ggplot2 package. After loading the ggplot2 package with the library()\n## function, I can run\nqplot(votes, rating, data = movies)\n## How can I modify the the code above to add a smoother to the scatterplot?\nqplot(votes, rating, data = movies) + geom_smooth() ## yes\nqplot(votes, rating, data = movies, smooth = \"loess\") ## no\nqplot(votes, rating, data = movies) + stats_smooth(\"loess\") ## no\n",
+    "created" : 1462563206804.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2922890188",
+    "id" : "E1EC13CB",
+    "lastKnownWriteTime" : 1462566436,
+    "last_content_update" : 1462566436879,
+    "path" : "D:/DATA.IDB/Documents/OneDrive - Inter-American Development Bank Group/Coursera_DataScience/04_Exploratory-data-analysis/assignments/hw2.R",
+    "project_path" : "hw2.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

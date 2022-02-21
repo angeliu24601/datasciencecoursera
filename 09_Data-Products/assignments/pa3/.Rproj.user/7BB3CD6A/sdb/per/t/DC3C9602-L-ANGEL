@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "## Load required packages\nlibrary(purrr);library(dplyr)\n\n## download baby names data set from Social Security Administration's website\nurl1 <- \"https://www.ssa.gov/oact/babynames/names.zip\"\nurl2 <- \"https://www.ssa.gov/oact/babynames/state/namesbystate.zip\"\ndownload.file(url1, \"./data_inputs/names.zip\")\ndownload.file(url2,\"./data_inputs/namesbystate.zip\")\n\n## unzip downloaded files\nunzip(\"./data_inputs/names.zip\", exdir = \"./data_inputs/names\")\nunzip(\"./data_inputs/namesbystate.zip\", exdir = \"./data_inputs/namesbystate\")\n\n## import data of baby names\n### import files at national level. Since the 'year' is not included as a\n### variable but in the names of each file, we will need to do\n### write a function to do the transformation during the importing process\nimport_names <- function(path, pattern){\n        list_names <- list.files(path,\n                                 pattern = pattern, recursive = TRUE,\n                                 full.names = TRUE) %>%\n                data.frame(FILE_PATH = ., stringsAsFactors = FALSE) %>%\n                mutate(YEAR = gsub(\"[^0-9]\", \"\", .$FILE_PATH))\n\n        names <-data.frame()\n\n        for (i in seq_along(list_names$FILE_PATH)) {\n                names0 <- read.table(list_names$FILE_PATH[i],\n                                     sep = \",\",\n                                     col.names = c(\"NAME\", \"GENDER\", \"COUNT\"),\n                                     stringsAsFactors = FALSE)\n                names0$YEAR <- list_names$YEAR[i]\n                names <- rbind(names, names0)\n        }\n        names\n}\n\n### import the files using the function\nnames <- import_names(path = \"./data_inputs/names\",\n                      pattern = \"txt\") %>%\n        mutate(GENDER = factor(GENDER), YEAR = as.numeric(YEAR)) %>%\n        select(YEAR, NAME, GENDER, COUNT)\n\n### import files at states level. This time since all variables are included\n### we do not need to write a function to tranform the data\nnamesbystate <- map_df(list.files(\"./data_inputs/namesbystate\",\n                                  pattern = \".TXT\",\n                                  full.names = TRUE,\n                                  recursive = TRUE),\n                       read.table, sep = \",\",\n                       stringsAsFactors = FALSE,\n                       col.names = c(\"STATE\", \"GENDER\",\n                                     \"YEAR\", \"NAME\", \"COUNT\"))\n\n\n## save data sets\nsaveRDS(names,\"./data_outputs/names.Rds\")\nsaveRDS(namesbystate,\"./data_outputs/namesbystate.Rds\")\n\n## save the data set that will be used to build the shiny app to the\n## shiny app folder as well\nsaveRDS(names,\"./shiny/names.Rds\")\n\n## clear the workspace\nrm(list = ls())\n",
+    "created" : 1482638001369.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1713623039",
+    "id" : "DC3C9602",
+    "lastKnownWriteTime" : 1482722114,
+    "last_content_update" : 1482722114784,
+    "path" : "~/Downloads/OneDrive - Inter-American Development Bank Group/ForMe/Coursera_DataScience/08_Data-Products/assignments/pa3/R/get_data.R",
+    "project_path" : "R/get_data.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

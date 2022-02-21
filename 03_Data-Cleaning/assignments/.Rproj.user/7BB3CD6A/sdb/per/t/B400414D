@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "# 0 Preparation steps\n##The script requires packages \"dplyr\" and \"tidyr\"\n##Download the datasets and unzip them into the specified sub-folder in the WD\nURL<- \"https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip\"\ntemp <- tempfile()\ndownload.file(URL,temp, method = \"curl\")\nunzip (temp,exdir = \"./\")\nrm(URL,temp)\n\n##Load the datasets into R and label the columns accordingly\nfeatures <- read.table(\"./UCI HAR Dataset/features.txt\")\nactivity.labels <- read.table(\"./UCI HAR Dataset/activity_labels.txt\",\n                              col.names = c(\"activity.code\",\"activity.name\"))\n## training data\nx.train <- read.table(\"./UCI HAR Dataset/train/X_train.txt\",\n                      col.names = features[,2])\ny.train <- read.table(\"./UCI HAR Dataset/train/y_train.txt\",\n                      col.names = \"activity.code\")\nsubject.train <- read.table(\"./UCI HAR Dataset/train/subject_train.txt\",\n                            col.names = \"subject\")\n## test data\nx.test <- read.table(\"./UCI HAR Dataset/test/X_test.txt\",\n                     col.names = features[,2])\ny.test <- read.table(\"./UCI HAR Dataset/test/y_test.txt\",\n                     col.names = \"activity.code\")\nsubject.test <- read.table(\"./UCI HAR Dataset/test/subject_test.txt\",\n                           col.names = \"subject\")\n\n# 1 Merge the training and the test sets\n##Merge the datasets of \"train\" into a single table\ntrain <- cbind(subject.train,y.train,x.train)\n\n##Merge the datasets of \"test\" into a single table\ntest <- cbind(subject.test,y.test,x.test)\n\n##Merge the training and test sets and clear redundant tables\ndataset <- rbind(train,test)\nrm(train,test,x.test,y.test,x.train,y.train,subject.test,subject.train)\n\n# 2 Extract the measurements on the mean & standard deviation\nlibrary(dplyr)\ndata.selected <- select(dataset,grep(\"*[Mm]ean*|*std*\",features$V2))\n\n# 3 Use descriptive activity names to name the activities in the data set\ndata.selected <- data.selected %>% \n  merge(activity.labels, by = c(\"activity.code\")) %>%\n  select(subject, activity.name, 3:86)\n\n# 4 Appropriately label the data set with descriptive variable names\n## Already carried out when importing the data sets.\n## The dataframe \"data.selected\" has descriptive column names\n\n# 5 Create a second, independent tidy data set with the average of each variable\n# for each activity and each subject.\n\n##Gather the columns of the measurements into a single column\nlibrary(tidyr)\ndata.tidy <- gather(data.selected, measurements, value, 3:86)\n\n##Group the tidy data set by measurements, subject, and activity\n##and get the average for the grouped data\naverage <- data.tidy %>% \n  group_by(measurements, activity.name, subject) %>%\n  summarize(mean(value)) %>% \n  arrange(measurements, activity.name, subject) %>%\n  rename(mean.value = `mean(value)`)\n  \n\n##Write the data as text file\nwrite.table(average, file = \"./data-cleaning_course-project.txt\", \n            row.name = FALSE)\n",
+    "created" : 1461723051229.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "998566474",
+    "id" : "B400414D",
+    "lastKnownWriteTime" : 1461900927,
+    "last_content_update" : 1461900927,
+    "path" : "~/Downloads/OneDrive - Inter-American Development Bank Group/Coursera_DataScience/03_Data-Cleaning/assignments/data-cleaning_project/run_analysis.R",
+    "project_path" : "data-cleaning_project/run_analysis.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,11 @@
+name: popularity_of_baby_names
+title: Popularity of Baby Names
+account: aliu
+server: shinyapps.io
+appId: 140731
+bundleId: 635889
+url: https://aliu.shinyapps.io/popularity_of_baby_names/
+when: 1480910355.40218
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|app1.R

@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1504313827875.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3024683749",
+    "id" : "2C25D163",
+    "lastKnownWriteTime" : 1529011490,
+    "last_content_update" : 1529011490472,
+    "path" : "~/Downloads/OneDrive - Inter-American Development Bank Group/ForMe/Coursera_DataScience/07_Regression-Models/peer-graded_assignment/coursera_ds_regmods_write-up.Rmd",
+    "project_path" : "coursera_ds_regmods_write-up.Rmd",
+    "properties" : {
+        "cursorPosition" : "1,50",
+        "ignored_words" : "mtcars,rownames,boxplot,disp,cyl,multi\n",
+        "last_setup_crc32" : "F98B7E37d849636c",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

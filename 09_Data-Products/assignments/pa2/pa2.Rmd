@@ -1,0 +1,49 @@
+---
+title: "Week 3 Assignment"
+author: "Ange Liu"
+date: "Nov 11, 2016"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyr); library(dplyr); library(forcats); library(ggthemes)
+library(plotly); library(ggplot2); library(babynames)
+```
+
+```{r data, include=FALSE}
+data("babynames")
+names_both <- babynames %>% 
+        filter(year >= 2014 - 20) %>% group_by(sex, name) %>%
+        summarize(n = sum(n)) %>%
+        group_by(name) %>%
+        mutate(total = sum(n),
+               prob = n/total,
+               cutoff = ifelse(prob > 1/3, 1, 0),
+               cutoff_both = sum(cutoff)) %>%
+        filter(cutoff_both == 2) %>% ungroup()
+
+names_both_top20 <- names_both %>%
+        arrange(desc(total), name) %>% 
+        mutate(name = fct_reorder(name, n)) %>%
+        head(40)
+
+```
+
+
+## Baby Names
+```{r}
+p <- ggplot(names_both_top20, 
+            aes(x = name, y = n, fill = sex)) + 
+        geom_bar(position = "stack", stat = "identity") +
+        labs(title = "Top 20 Most Common Unisex Names (born 1994 - 2014)", 
+             x = "Name", 
+             y = "Count of People with Name") +
+        coord_flip() +
+        theme_economist()
+ggplotly(p)
+```
+
+
+## Notes
+**Source**: Full baby name data provided by the [Social Security Administration (SSA)](https://www.ssa.gov/oact/babynames/limits.html). This includes all names with at least 5 uses

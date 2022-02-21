@@ -1,0 +1,5 @@
+"0","## get the confusion matrix for the models
+cfm_rpart <- confusionMatrix(predict_rpart, part_test$classe)
+"
+"2","Error: `data` and `reference` should be factors with the same levels.
+"
